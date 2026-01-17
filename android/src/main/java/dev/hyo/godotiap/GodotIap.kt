@@ -835,8 +835,8 @@ class GodotIap(godot: Godot) : GodotPlugin(godot) {
                 val json = if (optionsJson.isNotEmpty()) JSONObject(optionsJson) else null
                 val options = json?.let {
                     DeepLinkOptions(
-                        skuAndroid = it.optString("skuAndroid", null),
-                        packageNameAndroid = it.optString("packageNameAndroid", null)
+                        skuAndroid = it.optString("skuAndroid").takeIf { s -> s.isNotEmpty() },
+                        packageNameAndroid = it.optString("packageNameAndroid").takeIf { s -> s.isNotEmpty() }
                     )
                 }
 
@@ -932,7 +932,7 @@ class GodotIap(godot: Godot) : GodotPlugin(godot) {
 
                 // Build IAPKit props
                 val iapkitProps = RequestVerifyPurchaseWithIapkitProps(
-                    apiKey = json.optString("apiKey", null),
+                    apiKey = json.optString("apiKey").takeIf { it.isNotEmpty() },
                     apple = json.optJSONObject("apple")?.let { appleJson ->
                         RequestVerifyPurchaseWithIapkitAppleProps(
                             jws = appleJson.getString("jws")

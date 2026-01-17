@@ -14,6 +14,15 @@ import java.util.Locale
 internal object GodotIapHelper {
 
     /**
+     * Helper extension to get nullable string from JSONObject.
+     * Returns null if the key doesn't exist or the value is empty.
+     * This avoids Kotlin type inference issues with optString(key, null).
+     */
+    private fun JSONObject.optStringOrNull(key: String): String? {
+        return if (has(key)) optString(key).takeIf { it.isNotEmpty() } else null
+    }
+
+    /**
      * Sanitize a dictionary by removing null values.
      * Similar to ExpoIapHelper.sanitizeDictionary() for consistency.
      */
@@ -60,7 +69,7 @@ internal object GodotIapHelper {
         val json = JSONObject(paramsJson)
 
         // Parse type
-        val type = json.optString("type", null)
+        val type = json.optStringOrNull("type")
 
         // Parse skus - check multiple possible keys
         val skus = mutableListOf<String>()
@@ -72,15 +81,15 @@ internal object GodotIapHelper {
         }
 
         // Parse obfuscated IDs (support both Android-suffixed and plain keys)
-        val obfuscatedAccountId = json.optString("obfuscatedAccountIdAndroid", null)
-            ?: json.optString("obfuscatedAccountId", null)
-        val obfuscatedProfileId = json.optString("obfuscatedProfileIdAndroid", null)
-            ?: json.optString("obfuscatedProfileId", null)
+        val obfuscatedAccountId = json.optStringOrNull("obfuscatedAccountIdAndroid")
+            ?: json.optStringOrNull("obfuscatedAccountId")
+        val obfuscatedProfileId = json.optStringOrNull("obfuscatedProfileIdAndroid")
+            ?: json.optStringOrNull("obfuscatedProfileId")
 
         // Parse other options
         val isOfferPersonalized = json.optBoolean("isOfferPersonalized", false)
-        val purchaseToken = json.optString("purchaseTokenAndroid", null)
-            ?: json.optString("purchaseToken", null)
+        val purchaseToken = json.optStringOrNull("purchaseTokenAndroid")
+            ?: json.optStringOrNull("purchaseToken")
         val replacementMode = when {
             json.has("replacementModeAndroid") -> json.optInt("replacementModeAndroid")
             json.has("replacementMode") -> json.optInt("replacementMode")
@@ -91,8 +100,8 @@ internal object GodotIapHelper {
         val subscriptionProductReplacementParams = if (json.has("subscriptionProductReplacementParams")) {
             val paramsObj = json.optJSONObject("subscriptionProductReplacementParams")
             if (paramsObj != null) {
-                val oldProductId = paramsObj.optString("oldProductId", null)
-                val mode = paramsObj.optString("replacementMode", null)
+                val oldProductId = paramsObj.optString("oldProductId").takeIf { it.isNotEmpty() }
+                val mode = paramsObj.optString("replacementMode").takeIf { it.isNotEmpty() }
                 val parsedMode = parseSubscriptionReplacementMode(mode)
                 if (oldProductId != null && parsedMode != null) {
                     SubscriptionProductReplacementParamsAndroid(
