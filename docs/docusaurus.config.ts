@@ -45,12 +45,26 @@ const config: Config = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: '1.0 (Current)',
+              label: '1.1',
               path: '',
+            },
+            '1.0': {
+              label: '1.0',
+              path: '1.0',
             },
           },
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          feedOptions: {
+            type: ['rss', 'atom'],
+            xslt: true,
+          },
+          editUrl: 'https://github.com/hyochan/godot-iap/tree/main/docs/',
+          onInlineTags: 'warn',
+          onInlineAuthors: 'warn',
+          onUntruncatedBlogPosts: 'warn',
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -65,7 +79,7 @@ const config: Config = {
         hashed: true,
         language: ['en'],
         indexDocs: true,
-        indexBlog: false,
+        indexBlog: true,
         indexPages: false,
         docsRouteBasePath: '/',
         highlightSearchTermsOnTargetPage: true,
@@ -97,6 +111,11 @@ const config: Config = {
           sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Docs',
+        },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'left',
         },
         {
           href: 'https://github.com/hyochan/godot-iap',

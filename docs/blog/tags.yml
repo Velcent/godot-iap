@@ -1,0 +1,29 @@
+release:
+  label: Release
+  description: New version releases
+  permalink: /release
+
+android:
+  label: Android
+  description: Android-specific updates
+  permalink: /android
+
+ios:
+  label: iOS
+  description: iOS-specific updates
+  permalink: /ios
+
+macos:
+  label: macOS
+  description: macOS-specific updates
+  permalink: /macos
+
+breaking-change:
+  label: Breaking Change
+  description: Breaking changes that require migration
+  permalink: /breaking-change
+
+openiap:
+  label: OpenIAP
+  description: OpenIAP integration updates
+  permalink: /openiap
