@@ -2,6 +2,7 @@
 .godot/
 godot-cpp/
 *.import
+*.uid
 !Example/*.import
 export.cfg
 
