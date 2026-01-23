@@ -148,11 +148,11 @@ jobs:
           remote=["com.android.billingclient:billing:7.1.1", "io.github.hyochan.openiap:openiap-google:${OPENIAP_GOOGLE_VERSION}"]
           EOF
 
-          # Copy iOS frameworks (pre-built and committed to git)
+          # Copy iOS frameworks (already flat structure, no symlinks)
           cp -R addons/godot-iap/bin/ios/GodotIap.framework dist/addons/godot-iap/bin/ios/
           cp -R addons/godot-iap/bin/ios/SwiftGodotRuntime.framework dist/addons/godot-iap/bin/ios/
 
-          # Copy macOS frameworks (pre-built and committed to git)
+          # Copy macOS frameworks (already flat structure in git, no symlinks)
           mkdir -p dist/addons/godot-iap/bin/macos
           cp -R addons/godot-iap/bin/macos/GodotIap.framework dist/addons/godot-iap/bin/macos/
           cp -R addons/godot-iap/bin/macos/SwiftGodotRuntime.framework dist/addons/godot-iap/bin/macos/
