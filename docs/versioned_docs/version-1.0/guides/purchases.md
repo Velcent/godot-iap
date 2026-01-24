@@ -189,10 +189,14 @@ func buy_ios(product_id: String):
         "sku": product_id,
         "type": "inapp",
         "quantity": 1,  # Optional
-        "appAccountToken": "user-123"  # Optional
+        "appAccountToken": "550e8400-e29b-41d4-a716-446655440000"  # Must be UUID format
     }
     iap.request_purchase(JSON.stringify(params))
 ```
+
+:::warning appAccountToken UUID Requirement
+The `appAccountToken` must be a valid UUID format. If a non-UUID value is provided (e.g., `"user-123"`), Apple will silently return `null` for this field in the purchase response. See [OpenIAP Request Types](https://openiap.dev/docs/types/request) for details.
+:::
 
 ### Android
 

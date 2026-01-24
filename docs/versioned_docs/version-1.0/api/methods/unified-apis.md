@@ -188,7 +188,7 @@ func buy_subscription(subscription_id: String, offer_token: String = ""):
 | `type` | `String` | `"inapp"` or `"subs"` |
 | `offerToken` | `String` | (Android only) Subscription offer token |
 | `quantity` | `int` | (iOS only) Purchase quantity |
-| `appAccountToken` | `String` | (iOS only) User identifier |
+| `appAccountToken` | `String` | (iOS only) User identifier. **Must be UUID format** (e.g., `550e8400-e29b-41d4-a716-446655440000`). Non-UUID values result in `null`. |
 
 **Returns:** JSON string with result
 
