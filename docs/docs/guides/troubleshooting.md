@@ -261,7 +261,21 @@ Framework did not contain an Info.plist
 
 This is a [known Godot export bug](https://github.com/godotengine/godot/issues/109075). See the [iOS Setup Guide](../getting-started/setup-ios#fix-missing-infoplist-required) for the fix.
 
-2. **Invalid Product ID Error**
+2. **fetch_products() Returns Empty Array**
+
+If `fetch_products()` returns an empty array:
+
+```gdscript
+# Check these common issues:
+# - init_connection() must be called first and return true
+# - SKUs must exist in App Store Connect / Google Play Console
+# - Products must be in "Ready to Submit" or approved status
+# - Bundle ID must match the store configuration
+```
+
+See the [fetch_products API docs](../api/methods/unified-apis#fetch_products) for details.
+
+3. **Invalid Product ID Error**
 
 ```gdscript
 # Ensure:
@@ -271,7 +285,7 @@ This is a [known Godot export bug](https://github.com/godotengine/godot/issues/1
 # - Products are in "Ready to Submit" status
 ```
 
-3. **StoreKit Configuration**
+4. **StoreKit Configuration**
 
 ```
 # In Xcode:
@@ -279,7 +293,7 @@ This is a [known Godot export bug](https://github.com/godotengine/godot/issues/1
 # - For iOS 15+, ensure SwiftUI is available
 ```
 
-4. **Sandbox Testing**
+5. **Sandbox Testing**
 
 ```gdscript
 # For iOS sandbox testing:

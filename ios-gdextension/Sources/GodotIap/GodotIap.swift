@@ -138,26 +138,37 @@ public class GodotIap: RefCounted, @unchecked Sendable {
     public func fetchProducts(argsJson: String) -> String {
         GodotIapLog.payload("fetchProducts", payload: argsJson)
 
+        // Parse arguments
+        guard let data = argsJson.data(using: .utf8),
+              let args = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let skus = args["skus"] as? [String] else {
+            let errorResult: [String: Any] = ["error": "Invalid arguments", "products": []]
+            if let jsonData = try? JSONSerialization.data(withJSONObject: errorResult),
+               let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            }
+            return "{\"error\": \"Invalid arguments\", \"products\": []}"
+        }
+
+        let typeStr = args["type"] as? String ?? "all"
+        let queryType: ProductQueryType
+        switch typeStr {
+        case "inapp", "in-app":
+            queryType = .inApp
+        case "subs", "subscription":
+            queryType = .subs
+        default:
+            queryType = .all
+        }
+
+        // Use semaphore to wait for async result (like Android's runBlocking)
+        let semaphore = DispatchSemaphore(value: 0)
+        var resultJson = "{\"error\": \"Unknown error\", \"products\": []}"
+
         Task { [weak self] in
+            defer { semaphore.signal() }
+
             do {
-                guard let data = argsJson.data(using: .utf8),
-                      let args = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let skus = args["skus"] as? [String] else {
-                    await self?.emitProductsFetched(success: false, error: "Invalid arguments")
-                    return
-                }
-
-                let typeStr = args["type"] as? String ?? "all"
-                let queryType: ProductQueryType
-                switch typeStr {
-                case "inapp", "in-app":
-                    queryType = .inApp
-                case "subs", "subscription":
-                    queryType = .subs
-                default:
-                    queryType = .all
-                }
-
                 let request = ProductRequest(skus: skus, type: queryType)
                 let result = try await self?.openIap.fetchProducts(request)
 
@@ -181,15 +192,36 @@ public class GodotIap: RefCounted, @unchecked Sendable {
                     break
                 }
 
+                let responseDict: [String: Any] = ["products": productDicts]
+                if let jsonData = try? JSONSerialization.data(withJSONObject: responseDict),
+                   let jsonString = String(data: jsonData, encoding: .utf8) {
+                    resultJson = jsonString
+                }
+
+                // Also emit signal for listeners
                 await self?.emitProductsFetched(success: true, products: productDicts)
 
             } catch {
                 GodotIapLog.failure("fetchProducts", error: error)
+                let errorDict: [String: Any] = ["error": error.localizedDescription, "products": []]
+                if let jsonData = try? JSONSerialization.data(withJSONObject: errorDict),
+                   let jsonString = String(data: jsonData, encoding: .utf8) {
+                    resultJson = jsonString
+                }
+
                 await self?.emitProductsFetched(success: false, error: error.localizedDescription)
             }
         }
 
-        return "{\"status\": \"pending\"}"
+        // Wait for async task to complete (with timeout)
+        let timeout = DispatchTime.now() + .seconds(30)
+        if semaphore.wait(timeout: timeout) == .timedOut {
+            GodotIapLog.failure("fetchProducts", error: NSError(domain: "GodotIap", code: -1, userInfo: [NSLocalizedDescriptionKey: "Request timed out"]))
+            return "{\"error\": \"Request timed out\", \"products\": []}"
+        }
+
+        GodotIapLog.result("fetchProducts", value: resultJson)
+        return resultJson
     }
 
     // MARK: - Purchase Methods

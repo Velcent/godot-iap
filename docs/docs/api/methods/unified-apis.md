@@ -106,17 +106,16 @@ func load_products():
 
 **Returns:** `Array` of `Types.ProductAndroid` (Android) or `Types.ProductIOS` (iOS)
 
-:::tip Using Signals
-Products are also available through the `products_fetched` signal for async handling:
+:::tip Signal Available
+Products are also emitted via `products_fetched` signal for event-driven patterns:
 
 ```gdscript
-func _ready():
-    iap.products_fetched.connect(_on_products_fetched)
+iap.products_fetched.connect(_on_products_fetched)
 
 func _on_products_fetched(result: Dictionary):
-    if result.has("products"):
-        for product_dict in result["products"]:
-            print("Product: ", product_dict.get("id", ""))
+    if result.get("success", false) and result.has("productsJson"):
+        var products = JSON.parse_string(result["productsJson"])
+        # Handle products
 ```
 :::
 
@@ -469,6 +468,7 @@ func _load_products():
     request.skus = skus
     request.type = Types.ProductQueryType.ALL
 
+    # Returns products directly (both iOS and Android)
     products = iap.fetch_products(request)
     for product in products:
         print("Loaded: ", product.id, " - ", product.display_price)
@@ -477,10 +477,12 @@ func _on_connected():
     print("Store connected")
 
 func _on_products_fetched(result: Dictionary):
-    # Handle async products fetch (iOS)
-    if result.has("products"):
-        for product_dict in result["products"]:
-            print("Fetched: ", product_dict.get("id", ""))
+    # Also available via signal for event-driven patterns
+    if result.get("success", false) and result.has("productsJson"):
+        var parsed = JSON.parse_string(result["productsJson"])
+        if parsed is Array:
+            for product_dict in parsed:
+                print("Fetched: ", product_dict.get("id", ""))
 
 func _on_purchase_updated(purchase: Dictionary):
     var state = purchase.get("purchaseState", "")
