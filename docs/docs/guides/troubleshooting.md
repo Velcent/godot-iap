@@ -252,7 +252,16 @@ func handle_store_unavailable():
 
 #### iOS Issues
 
-1. **Invalid Product ID Error**
+1. **Framework Info.plist Missing**
+
+If you see this error when building in Xcode:
+```
+Framework did not contain an Info.plist
+```
+
+This is a [known Godot export bug](https://github.com/godotengine/godot/issues/109075). See the [iOS Setup Guide](../getting-started/setup-ios#fix-missing-infoplist-required) for the fix.
+
+2. **Invalid Product ID Error**
 
 ```gdscript
 # Ensure:
@@ -262,7 +271,7 @@ func handle_store_unavailable():
 # - Products are in "Ready to Submit" status
 ```
 
-2. **StoreKit Configuration**
+3. **StoreKit Configuration**
 
 ```
 # In Xcode:
@@ -270,7 +279,7 @@ func handle_store_unavailable():
 # - For iOS 15+, ensure SwiftUI is available
 ```
 
-3. **Sandbox Testing**
+4. **Sandbox Testing**
 
 ```gdscript
 # For iOS sandbox testing:

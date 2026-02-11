@@ -39,6 +39,44 @@ Library not loaded: @rpath/GodotIap.framework/GodotIap
 ```
 :::
 
+## Fix Missing Info.plist (Required)
+
+Due to a [Godot export bug](https://github.com/godotengine/godot/issues/109075), the `Info.plist` files inside frameworks may not be copied during export. This causes the build to fail with:
+
+```
+Framework did not contain an Info.plist
+```
+
+### Solution: Add Build Phase Script
+
+1. In Xcode, select your target
+2. Go to **Build Phases** tab
+3. Click **+** → **New Run Script Phase**
+4. Name it "Copy Framework Info.plist"
+5. Paste the following script:
+
+```bash
+# Copy missing Info.plist files for GodotIap frameworks
+ADDONS_DIR="${PROJECT_DIR}"
+FRAMEWORKS_DIR="${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}"
+
+if [ -f "${ADDONS_DIR}/addons/godot-iap/bin/ios/GodotIap.framework/Info.plist" ]; then
+    cp "${ADDONS_DIR}/addons/godot-iap/bin/ios/GodotIap.framework/Info.plist" \
+       "${FRAMEWORKS_DIR}/GodotIap.framework/" 2>/dev/null || true
+fi
+
+if [ -f "${ADDONS_DIR}/addons/godot-iap/bin/ios/SwiftGodotRuntime.framework/Info.plist" ]; then
+    cp "${ADDONS_DIR}/addons/godot-iap/bin/ios/SwiftGodotRuntime.framework/Info.plist" \
+       "${FRAMEWORKS_DIR}/SwiftGodotRuntime.framework/" 2>/dev/null || true
+fi
+```
+
+6. Drag this script phase **before** "Embed Frameworks" phase
+
+:::tip
+This script automatically copies the missing `Info.plist` files from the source frameworks to the build output. You only need to set this up once per project.
+:::
+
 ## App Store Connect
 
 For complete App Store Connect configuration including product setup and sandbox testing, visit:
