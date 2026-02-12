@@ -1,11 +1,34 @@
 #!/bin/bash
-# Pre-commit hook: Auto-build iOS framework when ios-gdextension files are modified
+# Pre-commit hook:
+# 1. Auto-sync versions when openiap-versions.json is modified
+# 2. Auto-build iOS framework when ios-gdextension files are modified
 
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." 2>/dev/null && pwd)" || PROJECT_ROOT="$(pwd)"
+
+# Check if openiap-versions.json is staged for commit
+VERSIONS_CHANGED=$(git diff --cached --name-only | grep -E '^openiap-versions\.json$')
+
+if [ -n "$VERSIONS_CHANGED" ]; then
+    echo -e "${YELLOW}openiap-versions.json modified${NC}"
+    echo -e "${GREEN}Running sync-versions.sh...${NC}"
+
+    if [ -f "$PROJECT_ROOT/scripts/sync-versions.sh" ]; then
+        "$PROJECT_ROOT/scripts/sync-versions.sh"
+
+        # Stage the updated files
+        git add "$PROJECT_ROOT/addons/godot-iap/godot_iap_plugin.gd" 2>/dev/null
+        git add "$PROJECT_ROOT/Example/addons/godot-iap/godot_iap_plugin.gd" 2>/dev/null
+        echo -e "${GREEN}✓ Version sync complete${NC}"
+    fi
+    echo ""
+fi
 
 # Check if any ios-gdextension files are staged for commit
 IOS_FILES_CHANGED=$(git diff --cached --name-only | grep -E '^ios-gdextension/')
