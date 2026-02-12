@@ -21,18 +21,12 @@ GOOGLE_VERSION=$(python3 -c "import json; print(json.load(open('$VERSIONS_FILE')
 COROUTINES_VERSION=$(grep "kotlinxCoroutinesVersion=" "$GRADLE_PROPS" | cut -d'=' -f2)
 
 echo "Versions:"
-echo "  OpenIAP Apple: $APPLE_VERSION"
+echo "  OpenIAP Apple: $APPLE_VERSION (read directly by Package.swift)"
 echo "  OpenIAP Google: $GOOGLE_VERSION"
 echo "  Kotlinx Coroutines: $COROUTINES_VERSION"
 
-# Update iOS Package.swift from template
-TEMPLATE_FILE="$PROJECT_ROOT/ios-gdextension/Package.swift.template"
-PACKAGE_FILE="$PROJECT_ROOT/ios-gdextension/Package.swift"
-
-if [ -f "$TEMPLATE_FILE" ]; then
-    sed "s/{{OPENIAP_APPLE_VERSION}}/$APPLE_VERSION/g" "$TEMPLATE_FILE" > "$PACKAGE_FILE"
-    echo "Updated: ios-gdextension/Package.swift (version: $APPLE_VERSION)"
-fi
+# Note: iOS Package.swift now reads version directly from openiap-versions.json
+# No template sync needed for iOS
 
 # Update godot_iap_plugin.gd Android dependencies
 PLUGIN_FILE="$PROJECT_ROOT/Example/addons/godot-iap/godot_iap_plugin.gd"

@@ -1,5 +1,19 @@
 // swift-tools-version: 5.9
 import PackageDescription
+import Foundation
+
+// Read OpenIAP version from openiap-versions.json
+let openIapVersion: String = {
+    let packageDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+    let versionsFile = packageDir.deletingLastPathComponent().appendingPathComponent("openiap-versions.json")
+
+    guard let data = try? Data(contentsOf: versionsFile),
+          let json = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+          let version = json["apple"] else {
+        fatalError("Failed to read apple version from openiap-versions.json")
+    }
+    return version
+}()
 
 let swiftSettings: [SwiftSetting] = [
     .unsafeFlags([
@@ -24,7 +38,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "SwiftGodot", path: "../SwiftGodot"),
-        .package(url: "https://github.com/hyodotdev/openiap.git", .upToNextMinor(from: "1.3.10"))
+        .package(url: "https://github.com/hyodotdev/openiap.git", .upToNextMinor(from: Version(stringLiteral: openIapVersion)))
     ],
     targets: [
         .target(
