@@ -32,10 +32,18 @@ The frameworks are located at:
 [exported_project]/addons/godot-iap/bin/ios/SwiftGodotRuntime.framework
 ```
 
+6. Go to **Build Settings** tab
+7. Search for **"Runpath Search Paths"** (`LD_RUNPATH_SEARCH_PATHS`)
+8. Add `@executable_path/Frameworks` if it is not already present
+
 :::warning Important
-If you skip this step, the app will crash on launch with:
+If you skip embedding the frameworks, the app will crash on launch with:
 ```
 Library not loaded: @rpath/GodotIap.framework/GodotIap
+```
+If you skip setting the Runpath Search Paths, the app will crash even with embedded frameworks:
+```
+Library not loaded: @rpath/SwiftGodotRuntime.framework/SwiftGodotRuntime
 ```
 :::
 

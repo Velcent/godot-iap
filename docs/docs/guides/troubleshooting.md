@@ -252,7 +252,17 @@ func handle_store_unavailable():
 
 #### iOS Issues
 
-1. **Framework Info.plist Missing**
+1. **Library not loaded: @rpath/SwiftGodotRuntime.framework**
+
+If the app crashes on launch with `Library not loaded: @rpath/SwiftGodotRuntime.framework/SwiftGodotRuntime`, the Xcode project is missing the Runpath Search Paths setting:
+
+1. Select your target → **Build Settings** tab
+2. Search for **"Runpath Search Paths"** (`LD_RUNPATH_SEARCH_PATHS`)
+3. Add `@executable_path/Frameworks`
+
+Also ensure both `GodotIap.framework` and `SwiftGodotRuntime.framework` are added with **"Embed & Sign"** in the General tab. See the [iOS Setup Guide](../getting-started/setup-ios#xcode-configuration-required) for full instructions.
+
+2. **Framework Info.plist Missing**
 
 If you see this error when building in Xcode:
 ```
