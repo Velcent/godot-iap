@@ -74,3 +74,37 @@ Fixed in abc1234 along with other review items.
 ```
 
 **Do NOT use backticks around the commit hash** - this breaks GitHub's auto-linking feature.
+
+## Workflow
+
+1. Fetch PR review comments (code-level comments):
+
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/{number}/comments
+   ```
+
+   This returns individual review comments with their `id` fields needed for replies.
+
+2. Also fetch general PR comments if needed:
+
+   ```bash
+   gh pr view <number> --comments
+   ```
+
+3. Review each comment and understand the requested change
+
+4. Make the necessary code changes
+
+5. Run relevant build commands based on changed files
+
+6. Commit with descriptive message referencing the review
+
+7. Push changes
+
+8. Reply to **each individual review comment** using the comment's `id`:
+
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies -X POST -f body="Fixed in abc1234."
+   ```
+
+   **CRITICAL:** You MUST include `-X POST` — without it the request defaults to GET and returns 404. Always reply directly to individual comments, NOT as a general PR review comment. Use the `/pulls/comments/{id}/replies` endpoint, NOT `gh pr review --comment`.
