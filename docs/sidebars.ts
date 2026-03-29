@@ -77,6 +77,11 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'doc',
+      id: 'openiap',
+      label: 'OpenIAP',
+    },
+    {
+      type: 'doc',
       id: 'sponsors',
       label: 'Sponsors',
     },
